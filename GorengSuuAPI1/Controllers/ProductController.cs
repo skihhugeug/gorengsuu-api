@@ -48,6 +48,32 @@ namespace GorengSuuAPI1.Controllers
             return Ok(products);
         }
 
+        [HttpGet("{id}")]
+        public IActionResult GetProduct(int id)
+        {
+            string connStr =
+                _configuration.GetConnectionString("DefaultConnection");
+            using var conn = new MySqlConnection(connStr);
+            conn.Open();
+            string sql = "SELECT * FROM products WHERE id=@id";
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                var product = new Product
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Nama = reader["nama"].ToString(),
+                    Harga = Convert.ToDecimal(reader["harga"]),
+                    Gambar = reader["gambar"].ToString(),
+                    Stok = Convert.ToInt32(reader["stok"])
+                };
+                return Ok(product);
+            }
+            return NotFound(new { message = "Produk tidak ditemukan" });
+        }
+
         [HttpPost]
         public IActionResult AddProduct(Product product)
         {
