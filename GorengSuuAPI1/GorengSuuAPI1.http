@@ -1,0 +1,6 @@
+@GorengSuuAPI1_HostAddress = http://localhost:5280
+
+GET {{GorengSuuAPI1_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
