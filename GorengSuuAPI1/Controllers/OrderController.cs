@@ -106,6 +106,36 @@ namespace GorengSuuAPI1.Controllers
             return Ok(items);
         }
 
+        [HttpGet("cek/{noHp}")]
+        public IActionResult GetOrderByNoHp(string noHp)
+        {
+            string connStr = _configuration.GetConnectionString("DefaultConnection");
+            using var conn = new MySqlConnection(connStr);
+            conn.Open();
+
+            string sql = "SELECT * FROM orders WHERE no_hp=@no_hp ORDER BY created_at DESC";
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@no_hp", noHp);
+            using var reader = cmd.ExecuteReader();
+
+            var orders = new List<Order>();
+            while (reader.Read())
+            {
+                orders.Add(new Order
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Nama = reader["nama"].ToString(),
+                    NoHp = reader["no_hp"].ToString(),
+                    Alamat = reader["alamat"].ToString(),
+                    Total = Convert.ToDecimal(reader["total"]),
+                    Status = reader["status"].ToString(),
+                    CreatedAt = Convert.ToDateTime(reader["created_at"])
+                });
+            }
+
+            return Ok(orders);
+        }
+
         [HttpPut("{id}")]
         public IActionResult UpdateStatus(int id, Order order)
         {
